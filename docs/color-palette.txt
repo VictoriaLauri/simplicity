@@ -1,0 +1,12 @@
+accent blue
+#222f59
+accent green
+#254b48
+bg green
+#e6f5f0
+bg blue
+#deebfc
+off white
+#f0f6fc
+light orange
+#fcf5eb
