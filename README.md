@@ -1,6 +1,6 @@
 # SimpliCity
 
-![SimpliCity logo](public/assets/logos/SimpliCity_dark_logo.png)
+![SimpliCity logo](public/assets/logos/SimpliCity_dark_logo_crop.png)
 
 **SimpliCity** is a property advice MVP that connects people with property experts. Whether you’re buying, renting, letting or selling, you can find trusted experts and save the services that matter to you.
 
