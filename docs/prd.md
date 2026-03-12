@@ -12,7 +12,7 @@ A two-sided marketplace connecting property experts with users (buyers, renters,
 **Success Definition**
 A functional platform where:
 - Experts can register, build a profile, and list services.
-- Users can register, create a profile, and "favourite" services/experts.
+- Users can register, create a profile, and "favourite" services.
 - Users can click through to an expert's external booking link (e.g., Calendly).
 
 ---
@@ -27,7 +27,7 @@ A functional platform where:
     - Service Management: Create/Delete service cards (Description, Price, Calendly Link).
 - **User Dashboard:**
     - Profile Management: Market Role (Renter, Buyer, Landlord), Needs/Bio.
-    - Favourites List: View saved services/experts.
+    - Favourites List: View saved services.
 - **Discovery:**
     - List of available services.
     - Expert profile pages (accessible via service cards).
