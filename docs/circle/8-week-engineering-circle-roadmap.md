@@ -6,9 +6,9 @@
 - Lock scope to **Marketplace-lite**: auth, role onboarding, expert profile, service listing, favourites, and external booking link only.
 - Lock delivery shape to **single seeded expert + seeded service first**, then optional expansion if capacity remains.
 - Treat these docs as primary references:
-  - [c:/dev/simplicity/README.md](c:/dev/simplicity/README.md)
-  - [c:/dev/simplicity/docs/prd.md](c:/dev/simplicity/docs/prd.md)
-  - [c:/dev/simplicity/docs/database/schema_v1.sql](c:/dev/simplicity/docs/database/schema_v1.sql)
+  - [README.md](../../README.md)
+  - [docs/prd.md](../prd.md)
+  - [docs/database/schema_v1.sql](../database/schema_v1.sql)
 - Defer/no-build: Stripe, on-platform payments, messaging, reviews, advanced search/filtering.
 
 ## Delivery Sequencing Rule (Team Default)
@@ -25,19 +25,18 @@ This rule is intentionally strict for Weeks 1-2 to prevent rework and schema/UI 
 
 ## Working Artifacts and Ownership
 
-- **Product scope and behavior:** [c:/dev/simplicity/docs/prd.md](c:/dev/simplicity/docs/prd.md) (canonical source of truth).
+- **Product scope and behavior:** [docs/prd.md](../prd.md) (canonical source of truth).
 - **Delivery planning and sequencing:** this roadmap file.
 - **Implementation work items:** GitHub Issues and PRs linked back to PRD/roadmap sections.
-- **Schema contract and security posture:** [c:/dev/simplicity/docs/database/schema_v1.sql](c:/dev/simplicity/docs/database/schema_v1.sql), to be validated against finalized user stories and page map in Week 1.
-
+- **Schema contract and security posture:** [docs/database/schema_v1.sql](../database/schema_v1.sql), to be validated against finalized user stories and page map in Week 1.
 
 ## Current State vs MVP (What Exists)
 
-- App shell only (starter UI) in [c:/dev/simplicity/src/app/page.tsx](c:/dev/simplicity/src/app/page.tsx).
-- Layout + metadata exists in [c:/dev/simplicity/src/app/layout.tsx](c:/dev/simplicity/src/app/layout.tsx).
-- Supabase server client exists in [c:/dev/simplicity/src/lib/supabase/server.ts](c:/dev/simplicity/src/lib/supabase/server.ts).
-- Health endpoint exists but is likely schema-misaligned (`healthcheck` table not in schema) in [c:/dev/simplicity/src/app/api/health/supabase/route.ts](c:/dev/simplicity/src/app/api/health/supabase/route.ts).
-- DB model and RLS are being prepared in [c:/dev/simplicity/docs/database/schema_v1.sql](c:/dev/simplicity/docs/database/schema_v1.sql).
+- App shell only (starter UI) in [src/app/page.tsx](../../src/app/page.tsx).
+- Layout + metadata exists in [src/app/layout.tsx](../../src/app/layout.tsx).
+- Supabase server client exists in [src/lib/supabase/server.ts](../../src/lib/supabase/server.ts).
+- Health endpoint exists but is likely schema-misaligned (`healthcheck` table not in schema) in [src/app/api/health/supabase/route.ts](../../src/app/api/health/supabase/route.ts).
+- DB model and RLS are being prepared in [docs/database/schema_v1.sql](../database/schema_v1.sql).
 
 ## Detailed 2-Week Plan (Immediate Focus)
 
