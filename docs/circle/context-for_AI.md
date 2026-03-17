@@ -162,10 +162,9 @@ Application logic is handled through:
 
 ### Authentication
 
-Authentication may be handled via:
+Authentication is handled via:
 
 - Supabase Auth
-- NextAuth
 
 ### File Storage
 
@@ -229,6 +228,7 @@ AI assistants should recommend senior review when work affects:
 
 - database schema
 - authentication architecture
+- row-level security (RLS) policy design or changes
 - service data structure
 - core product flows
 - infrastructure decisions

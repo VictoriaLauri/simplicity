@@ -103,7 +103,7 @@ A functional platform where:
 - **Styling:** Tailwind CSS.
 - **Database:** PostgreSQL (via Supabase).
 - **ORM:** Prisma.
-- **Auth:** Supabase Auth or NextAuth.
+- **Auth:** Supabase Auth.
 - **Storage:** Supabase Storage (for profile photos).
 
 ### 5.2 Data Model (Draft)
@@ -136,13 +136,13 @@ model UserProfile {
 }
 
 model Service {
-  id          String @id @default(uuid())
-  expertId    String
-  title       String
-  description String
-  price       String
-  bookingUrl  String
-  favorites   Favorite[]
+  id            String @id @default(uuid())
+  expert_user_id String
+  title         String
+  description   String
+  price_label   String
+  booking_url   String
+  favorites     Favorite[]
 }
 
 model Favorite {
