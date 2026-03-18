@@ -12,7 +12,7 @@ A two-sided marketplace connecting property experts with users (buyers, renters,
 **Success Definition**
 A functional platform where:
 - Experts can register, build a profile, and list services.
-- Users can register, create a profile, and "favourite" services/experts.
+- Users can register, create a profile, and "favourite" services.
 - Users can click through to an expert's external booking link (e.g., Calendly).
 
 ---
@@ -27,7 +27,7 @@ A functional platform where:
     - Service Management: Create/Delete service cards (Description, Price, Calendly Link).
 - **User Dashboard:**
     - Profile Management: Market Role (Renter, Buyer, Landlord), Needs/Bio.
-    - Favourites List: View saved services/experts.
+    - Favourites List: View saved services.
 - **Discovery:**
     - List of available services.
     - Expert profile pages (accessible via service cards).
@@ -103,7 +103,7 @@ A functional platform where:
 - **Styling:** Tailwind CSS.
 - **Database:** PostgreSQL (via Supabase).
 - **ORM:** Prisma.
-- **Auth:** Supabase Auth or NextAuth.
+- **Auth:** Supabase Auth.
 - **Storage:** Supabase Storage (for profile photos).
 
 ### 5.2 Data Model (Draft)
@@ -136,13 +136,13 @@ model UserProfile {
 }
 
 model Service {
-  id          String @id @default(uuid())
-  expertId    String
-  title       String
-  description String
-  price       String
-  bookingUrl  String
-  favorites   Favorite[]
+  id            String @id @default(uuid())
+  expert_user_id String
+  title         String
+  description   String
+  price_label   String
+  booking_url   String
+  favorites     Favorite[]
 }
 
 model Favorite {
