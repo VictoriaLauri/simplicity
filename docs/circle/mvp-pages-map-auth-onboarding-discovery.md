@@ -2,7 +2,7 @@
 
 ## Scope and Purpose
 
-- Scope for this map: auth, onboarding, discovery feed, expert profile, favourites, and expert dashboard placeholder.
+- Scope for this map: auth, onboarding, discovery feed, expert profile, favourites, external booking handoff, and expert self-management (thin CRUD).
 - Purpose: define route behavior and required UI states before implementation to reduce schema/UI drift.
 - Each page below includes: access rule, primary actions, required states, and data dependencies.
 
@@ -12,6 +12,7 @@
 2. Authenticated users with null `profiles.role` are forced to `/onboarding/role`.
 3. USER and EXPERT role gates apply on role-specific pages.
 4. Unknown route parameters return not-found state.
+5. Unverified accounts cannot access protected app routes until verification is complete.
 
 ## Cross-Page Accessibility Baseline
 
@@ -47,7 +48,7 @@
 - Type: Public auth page
 - Access: Unauthenticated preferred
 - Goal: Authenticate existing user
-- Primary actions: Submit login form, navigate to signup
+- Primary actions: Submit login form, navigate to signup, request password reset
 - Data dependencies: auth provider + profile role read
 
 ### Required states (`/auth/login`)
@@ -55,7 +56,9 @@
 1. Idle form
 2. Submitting
 3. Validation/auth error
-4. Success redirect
+4. Unverified-email guidance with resend action
+5. Rate-limit/lockout guidance state
+6. Success redirect
 
 ### Redirect rules (`/auth/login`)
 
@@ -71,18 +74,56 @@
 - Access: Unauthenticated preferred
 - Goal: Create new account
 - Primary actions: Submit registration form
-- Data dependencies: auth provider, profile bootstrap trigger
+- Data dependencies: auth provider, profile bootstrap trigger, consent timestamp persistence
 
 ### Required states (`/auth/signup`)
 
 1. Idle form
 2. Submitting
 3. Validation/signup error
-4. Success redirect to onboarding
+4. Bot challenge/rate-limit response
+5. Success state with verify-email next-step guidance
 
 ### Notes (`/auth/signup`)
 
-- Keep copy explicit about next step: role onboarding after signup.
+- Require Terms/Privacy consent before submit.
+- Keep copy explicit about next step: verify email, then role onboarding at first authenticated login.
+
+---
+
+## Route: `/auth/forgot-password`
+
+- Type: Public auth recovery page
+- Access: Everyone
+- Goal: Start password recovery safely
+- Primary actions: Submit email for recovery link
+- Data dependencies: auth provider password reset request
+
+### Required states (`/auth/forgot-password`)
+
+1. Idle form
+2. Submitting
+3. Validation error
+4. Non-enumerating success response (same message for known/unknown email)
+5. Rate-limit/backoff response
+
+---
+
+## Route: `/auth/reset-password`
+
+- Type: Public recovery completion page
+- Access: Recovery-token context
+- Goal: Set a new password after recovery link
+- Primary actions: Enter and submit new password
+- Data dependencies: auth provider recovery token + password update
+
+### Required states (`/auth/reset-password`)
+
+1. Loading/validating recovery token
+2. Invalid/expired/used token state with request-new-link path
+3. Password form
+4. Submitting
+5. Success redirect to login
 
 ---
 
@@ -129,9 +170,12 @@
 ### Behavior rules (`/services`)
 
 - Show only published services.
+- Query and render only public-safe fields.
+- Use deterministic ordering and defined pagination/load-more behavior.
 - If user is authenticated USER, render favourite state.
 - If unauthenticated, favourite action routes/prompts login.
-- Booking action opens external URL in new tab when valid.
+- Booking action opens external URL in new tab only when URL passes safe validation (`https` and safe scheme checks).
+- External booking action must indicate external destination clearly.
 
 ---
 
@@ -155,6 +199,9 @@
 
 - Invalid or missing expert record -> not-found state.
 - Services list only includes published services.
+- Query and render only public-safe expert and service fields.
+- Expert services list uses deterministic ordering and defined pagination/load-more behavior.
+- Partial expert metadata and broken media render stable fallbacks.
 
 ---
 
@@ -174,11 +221,19 @@
 4. Populated list
 5. Empty list
 6. Fetch error
+7. Unavailable service fallback state
 
 ### Redirect rules (`/favourites`)
 
 - Unauthenticated -> `/auth/login`
 - Authenticated EXPERT -> `/expert/dashboard` (or explicit unauthorized page)
+
+### Behavior rules (`/favourites`)
+
+- Render from server-authoritative owner-scoped dataset only.
+- List ordering and pagination/load-more behavior are deterministic.
+- Unpublished/deleted services referenced by favorites use explicit fallback behavior.
+- Cross-tab/service changes reconcile predictably on refresh/revalidate.
 
 ---
 
@@ -187,7 +242,7 @@
 - Type: Protected EXPERT page
 - Access: Authenticated EXPERT role only
 - Goal: Landing area for expert management flows
-- Primary actions: navigate to profile editor/service manager (future pages)
+- Primary actions: navigate to profile editor and services manager
 - Data dependencies: `profiles.role`, optional expert summary read
 
 ### Required states (`/expert/dashboard`)
@@ -200,7 +255,62 @@
 
 ### Notes (`/expert/dashboard`)
 
-- Keep Week 1-2 dashboard intentionally thin to preserve scope.
+- Keep dashboard thin, but it must route to profile and service management flows defined below.
+
+---
+
+## Route: `/expert/profile`
+
+- Type: Protected EXPERT page
+- Access: Authenticated EXPERT role only
+- Goal: Create/update expert public profile
+- Primary actions: edit fields, save
+- Data dependencies: `profiles`, `expert_profiles`
+
+### Required states (`/expert/profile`)
+
+1. Auth-required redirect
+2. Role-gate redirect/deny for USER
+3. Loading existing profile
+4. Editable form
+5. Saving
+6. Save success
+7. Save error with preserved inputs/retry
+
+### Behavior rules (`/expert/profile`)
+
+- Server-side owner authorization is required for all writes.
+- Public output is limited to safe profile fields only.
+- Missing optional fields and invalid media resolve to graceful fallbacks.
+
+---
+
+## Route: `/expert/services`
+
+- Type: Protected EXPERT page
+- Access: Authenticated EXPERT role only
+- Goal: Manage own service listings (create/edit/unpublish/delete)
+- Primary actions: create service, edit service, unpublish service, delete service
+- Data dependencies: `services`
+
+### Required states (`/expert/services`)
+
+1. Auth-required redirect
+2. Role-gate redirect/deny for USER
+3. Loading list
+4. Empty state
+5. Populated list
+6. Create/edit form with validation
+7. Saving mutation
+8. Mutation success/error with deterministic UI reconciliation
+9. Delete confirmation state
+
+### Behavior rules (`/expert/services`)
+
+- All writes are server-authorized and owner-bound; forged identity attempts are rejected.
+- Booking URL input must pass safe validation before save.
+- Publish state controls public discovery visibility.
+- Duplicate submit and repeated actions are handled idempotently where feasible.
 
 ---
 
@@ -211,6 +321,7 @@
 1. Default view with title/price/expert/description
 2. Favourite default/favourited/loading/error states
 3. Book enabled/disabled states based on URL validity
+4. External booking trust cue and safe-link behavior
 
 ### Auth Guard Wrapper
 
