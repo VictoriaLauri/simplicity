@@ -1,5 +1,5 @@
 /*
-  SimpliCity MVP schema v1
+  SimpliCity MVP schema v1.1
   - Auth-backed profiles
   - Expert & User profiles
   - Services
@@ -29,6 +29,8 @@ create table if not exists public.profiles (
   role public.user_role,
   display_name text,
   photo_url text,
+  terms_accepted_at timestamptz,
+  privacy_accepted_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -58,14 +60,22 @@ create table if not exists public.services (
   expert_user_id uuid not null references public.profiles(id) on delete cascade,
   title text not null,
   description text not null,
+  price numeric(10,2),
+  currency text,
   price_label text,
   booking_url text,
   is_published boolean not null default true,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  constraint services_currency_format_chk
+    check (currency is null or currency ~ '^[A-Z]{3}$'),
+  constraint services_booking_url_https_chk
+    check (booking_url is null or booking_url ~* '^https://')
 );
 
 create index if not exists idx_services_expert_user_id on public.services(expert_user_id);
+create index if not exists idx_services_published_created_at
+  on public.services(is_published, created_at desc);
 
 -- 6) Favorites (user -> service)
 create table if not exists public.favorites (
@@ -76,6 +86,8 @@ create table if not exists public.favorites (
 );
 
 create index if not exists idx_favorites_service_id on public.favorites(service_id);
+create index if not exists idx_favorites_user_created_at
+  on public.favorites(user_id, created_at desc);
 
 -- 7) updated_at trigger helper
 create or replace function public.set_updated_at()
@@ -152,8 +164,24 @@ using (true);
 drop policy if exists "expert_profiles_upsert_own" on public.expert_profiles;
 create policy "expert_profiles_upsert_own"
 on public.expert_profiles for all
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using (
+  auth.uid() = user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'EXPERT'
+  )
+)
+with check (
+  auth.uid() = user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'EXPERT'
+  )
+);
 
 -- USER PROFILES POLICIES (private by default: only owner can read/write)
 drop policy if exists "user_profiles_owner_only" on public.user_profiles;
@@ -163,22 +191,74 @@ using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
 -- SERVICES POLICIES
--- Everyone can read services (public feed)
+-- Everyone can read published services (public feed)
 drop policy if exists "services_select_public" on public.services;
 create policy "services_select_public"
 on public.services for select
 using (is_published = true);
 
+-- Experts can also read their own services (including unpublished)
+drop policy if exists "services_select_own" on public.services;
+create policy "services_select_own"
+on public.services for select
+using (
+  auth.uid() = expert_user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'EXPERT'
+  )
+);
+
 -- Experts can create/update/delete their own services
 drop policy if exists "services_modify_own" on public.services;
 create policy "services_modify_own"
 on public.services for all
-using (auth.uid() = expert_user_id)
-with check (auth.uid() = expert_user_id);
+using (
+  auth.uid() = expert_user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'EXPERT'
+  )
+)
+with check (
+  auth.uid() = expert_user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'EXPERT'
+  )
+);
 
--- FAVORITES POLICIES (owner only)
+-- FAVORITES POLICIES (owner USER only; target must be published)
 drop policy if exists "favorites_owner_only" on public.favorites;
 create policy "favorites_owner_only"
 on public.favorites for all
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using (
+  auth.uid() = user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'USER'
+  )
+)
+with check (
+  auth.uid() = user_id
+  and exists (
+    select 1
+    from public.profiles p
+    where p.id = auth.uid()
+      and p.role = 'USER'
+  )
+  and exists (
+    select 1
+    from public.services s
+    where s.id = service_id
+      and s.is_published = true
+  )
+);
