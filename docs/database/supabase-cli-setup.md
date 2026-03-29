@@ -38,16 +38,24 @@ Push all migrations:
 
 ## Seed data
 
-1. In Supabase Dashboard, create these users in Auth first:
+1. Ensure these Auth users exist (create only if missing):
    - `expert.alex@simplicity.local`
    - `expert.maya@simplicity.local`
    - `user.sophia@simplicity.local`
+
+   Notes:
+   - In the shared DEV project, these users already exist, so contributors usually do not need to create them again.
+   - In a fresh/new project, create them first in Supabase Auth before running seed.
 
 2. Run seed against the linked project:
 
    `npm run db:seed:linked`
 
 ## Local development DB (optional)
+
+Use this when you want to test migrations/seed locally without touching the shared remote project.
+
+Prerequisite: Docker Desktop must be running.
 
 Start local stack:
 
@@ -56,6 +64,24 @@ Start local stack:
 Reset local DB to migrations + seed:
 
 `npm run db:reset`
+
+This recreates the local DB, reapplies migrations, and reruns seed.
+It is destructive for local data only (does not affect linked remote project).
+
+When to add local Auth users:
+
+1. Run `npm run db:reset` first.
+2. Open local Supabase Studio (URL shown by `supabase:start`, usually `http://127.0.0.1:54323`).
+3. Go to `Authentication -> Users` and create:
+   - `expert.alex@simplicity.local`
+   - `expert.maya@simplicity.local`
+   - `user.sophia@simplicity.local`
+4. Run `npm run db:seed:local` again.
+
+Why this order:
+
+- `db:reset` recreates the local database and clears local auth data.
+- Creating users before `db:reset` would be wiped.
 
 Stop local stack:
 
