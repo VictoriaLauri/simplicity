@@ -7,6 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "supabase:link": "npx supabase link",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "db:push": "npx supabase db push",
+    "db:reset": "npx supabase db reset",
+    "db:seed:linked": "npx supabase db query --linked --file supabase/seed.sql",
+    "db:seed:local": "npx supabase db query --local --file supabase/seed.sql",
     "format": "prettier . --write",
     "format:check": "prettier . --check"
   },
