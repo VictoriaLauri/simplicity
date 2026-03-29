@@ -1,13 +1,19 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --foreground-rgb: 18, 51, 45;
-  --background-start-rgb: 248, 252, 250;
-  --background-end-rgb: 231, 245, 240;
+  --brand-foreground-rgb-light: 18, 51, 45;
+  --brand-background-start-rgb-light: 248, 252, 250;
+  --brand-background-end-rgb-light: 231, 245, 240;
+  --brand-foreground-rgb-dark: 236, 247, 243;
+  --brand-background-start-rgb-dark: 0, 86, 70;
+  --brand-background-end-rgb-dark: 7, 77, 64;
+  --foreground-rgb: var(--brand-foreground-rgb-light);
+  --background-start-rgb: var(--brand-background-start-rgb-light);
+  --background-end-rgb: var(--brand-background-end-rgb-light);
   --background: #f8fcfa;
   --foreground: #12332d;
   --card: #ffffff;
@@ -44,9 +50,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --foreground-rgb: 236, 247, 243;
-    --background-start-rgb: 0, 86, 70;
-    --background-end-rgb: 7, 77, 64;
+    --foreground-rgb: var(--brand-foreground-rgb-dark);
+    --background-start-rgb: var(--brand-background-start-rgb-dark);
+    --background-end-rgb: var(--brand-background-end-rgb-dark);
   }
 }
 
@@ -128,23 +134,23 @@
 }
 
 @layer components {
-  [data-slot='button']:not(:disabled):hover {
+  [data-slot="button"]:not(:disabled):hover {
     @apply -translate-y-0.5 shadow-md ring-1 ring-black/10;
   }
 
   :is(
-    [data-slot='input'],
-    [data-slot='textarea'],
-    [data-slot='select-trigger']
+    [data-slot="input"],
+    [data-slot="textarea"],
+    [data-slot="select-trigger"]
   ):focus-visible {
     @apply border-ring ring-2 ring-ring/50;
   }
 
   :is(
-    [data-slot='input'],
-    [data-slot='textarea'],
-    [data-slot='select-trigger']
-  )[aria-invalid='true'] {
+    [data-slot="input"],
+    [data-slot="textarea"],
+    [data-slot="select-trigger"]
+  )[aria-invalid="true"] {
     @apply border-destructive ring-2 ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40;
   }
 }

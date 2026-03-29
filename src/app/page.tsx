@@ -46,7 +46,7 @@ export default function Home() {
                 <p className="text-sm font-medium text-muted-foreground">
                   Dark logo
                 </p>
-                <div className="mx-auto max-w-sm overflow-hidden rounded-lg border border-border bg-[#005646] p-3">
+                <div className="mx-auto max-w-sm overflow-hidden rounded-lg border border-border bg-primary p-3">
                   <Image
                     src="/assets/logos/SimpliCity_dark_logo.png"
                     alt="SimpliCity dark logo on deep green background"
@@ -117,7 +117,9 @@ export default function Home() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="buying">Buying strategy</SelectItem>
-                    <SelectItem value="investment">Investment options</SelectItem>
+                    <SelectItem value="investment">
+                      Investment options
+                    </SelectItem>
                     <SelectItem value="mortgage">Mortgage guidance</SelectItem>
                   </SelectContent>
                 </Select>
