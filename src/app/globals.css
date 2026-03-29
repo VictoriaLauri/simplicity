@@ -1,6 +1,6 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,15 +128,23 @@
 }
 
 @layer components {
-  [data-slot="button"]:not(:disabled):hover {
+  [data-slot='button']:not(:disabled):hover {
     @apply -translate-y-0.5 shadow-md ring-1 ring-black/10;
   }
 
-  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):focus-visible {
+  :is(
+    [data-slot='input'],
+    [data-slot='textarea'],
+    [data-slot='select-trigger']
+  ):focus-visible {
     @apply border-ring ring-2 ring-ring/50;
   }
 
-  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"])[aria-invalid="true"] {
+  :is(
+    [data-slot='input'],
+    [data-slot='textarea'],
+    [data-slot='select-trigger']
+  )[aria-invalid='true'] {
     @apply border-destructive ring-2 ring-destructive/20 dark:border-destructive/50 dark:ring-destructive/40;
   }
 }
